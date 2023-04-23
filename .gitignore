@@ -3,6 +3,7 @@
 # sample files
 books/*.pdf
 books/*.epub
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
