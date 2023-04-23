@@ -1,3 +1,9 @@
+##### CUSTOM
+
+# sample files
+books/*.pdf
+books/*.epub
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
