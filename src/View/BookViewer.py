@@ -1,6 +1,7 @@
 import os
 import fitz
 import sys
+import logging
 import PyQt6
 import PyQt6.QtCore as QtCore
 from PyQt6.QtWidgets import (
@@ -13,6 +14,8 @@ from PyQt6.QtWidgets import (
     QListWidget,
 )
 from PyQt6.QtGui import QGuiApplication, QScreen, QPainter, QImage, QKeyEvent, QPixmap
+
+logging.basicConfig(level=logging.CRITICAL)
 
 
 class BookViewer(QWidget):
@@ -56,28 +59,33 @@ class BookViewer(QWidget):
         self.dialog_layout.addWidget(self.list_widget)
         self.dialog.exec()
 
-    def clicked_list_item(self, item):
+    def clicked_list_item(self, item: PyQt6.QtWidgets.QListWidgetItem):
         path = self.book_paths[item.row()]
-        self.load_pdf(path)
+        self.load_book(path)
         self.close_dialog_box()
 
     def activated_list_item(self, item):
         path = item.text()
-        self.load_pdf(path)
+        self.load_book(path)
         self.close_dialog_box()
 
     def close_dialog_box(self):
         self.dialog.close()
 
-    def load_pdf(self, path):
+    def load_book(self, path: str, page: int = 0):
         self.doc = fitz.open(path)
-        self.current_page = 0
+        self.current_page = page
         self.pages = [self.doc.load_page(i) for i in range(self.doc.page_count)]
         self.update_image()
 
     def update_image(self):
         page = self.pages[self.current_page]
         pix = page.get_pixmap()
+
+        # Calculate the center position
+        center_x = (self.image_label.width() - pix.width) // 2
+        center_y = (self.image_label.height() - pix.height) // 2
+
         image_format = (
             QImage.Format.Format_RGB888
             if pix.alpha == 0
@@ -86,3 +94,12 @@ class BookViewer(QWidget):
         image = QImage(pix.samples, pix.width, pix.height, pix.stride, image_format)
         pixmap = QPixmap.fromImage(image)
         self.set_image(pixmap)
+
+        # Create a new pixmap with centered image
+        centered_pixmap = QPixmap(self.image_label.size())
+        centered_pixmap.fill(QtCore.Qt.GlobalColor.white)  # Fill with white background
+        painter = QPainter(centered_pixmap)
+        painter.drawPixmap(center_x, center_y, pix)
+        painter.end()
+
+        self.set_image(centered_pixmap)

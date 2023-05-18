@@ -1,0 +1,10 @@
+{
+    "books": [
+        {
+            "id": 1,
+            "filename": "sample3",
+            "type": "pdf",
+            "current_page": 3
+        }
+    ]
+}
