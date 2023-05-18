@@ -73,6 +73,7 @@ class BookViewer(QWidget):
         self.dialog.close()
 
     def load_book(self, path: str, page: int = 0):
+        ### TODO: #7 load book on page in storage
         self.doc = fitz.open(path)
         self.current_page = page
         self.pages = [self.doc.load_page(i) for i in range(self.doc.page_count)]
