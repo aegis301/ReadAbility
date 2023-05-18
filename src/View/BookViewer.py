@@ -1,6 +1,7 @@
 import os
 import fitz
 import sys
+import logging
 import PyQt6
 import PyQt6.QtCore as QtCore
 from PyQt6.QtWidgets import (
@@ -13,6 +14,8 @@ from PyQt6.QtWidgets import (
     QListWidget,
 )
 from PyQt6.QtGui import QGuiApplication, QScreen, QPainter, QImage, QKeyEvent, QPixmap
+
+logging.basicConfig(level=logging.CRITICAL)
 
 
 class BookViewer(QWidget):
@@ -56,22 +59,23 @@ class BookViewer(QWidget):
         self.dialog_layout.addWidget(self.list_widget)
         self.dialog.exec()
 
-    def clicked_list_item(self, item):
+    def clicked_list_item(self, item: PyQt6.QtWidgets.QListWidgetItem):
         path = self.book_paths[item.row()]
-        self.load_pdf(path)
+        self.load_book(path)
         self.close_dialog_box()
 
     def activated_list_item(self, item):
         path = item.text()
-        self.load_pdf(path)
+        self.load_book(path)
         self.close_dialog_box()
 
     def close_dialog_box(self):
         self.dialog.close()
 
-    def load_pdf(self, path):
+    def load_book(self, path: str, page: int = 0):
+        ### TODO: #7 load book on page in storage
         self.doc = fitz.open(path)
-        self.current_page = 0
+        self.current_page = page
         self.pages = [self.doc.load_page(i) for i in range(self.doc.page_count)]
         self.update_image()
 
