@@ -81,11 +81,6 @@ class BookViewer(QWidget):
     def update_image(self):
         page = self.pages[self.current_page]
         pix = page.get_pixmap()
-
-        # Calculate the center position
-        center_x = (self.image_label.width() - pix.width) // 2
-        center_y = (self.image_label.height() - pix.height) // 2
-
         image_format = (
             QImage.Format.Format_RGB888
             if pix.alpha == 0
@@ -94,12 +89,3 @@ class BookViewer(QWidget):
         image = QImage(pix.samples, pix.width, pix.height, pix.stride, image_format)
         pixmap = QPixmap.fromImage(image)
         self.set_image(pixmap)
-
-        # Create a new pixmap with centered image
-        centered_pixmap = QPixmap(self.image_label.size())
-        centered_pixmap.fill(QtCore.Qt.GlobalColor.white)  # Fill with white background
-        painter = QPainter(centered_pixmap)
-        painter.drawPixmap(center_x, center_y, pix)
-        painter.end()
-
-        self.set_image(centered_pixmap)

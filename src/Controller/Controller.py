@@ -20,17 +20,25 @@ class BookController:
         self.usb_devices = self.list_usb_devices()
         self.viewer.book_paths = [self.get_paths(device) for device in self.usb_devices]
         self.viewer.book_paths = list(itertools.chain(*self.viewer.book_paths))
-        self.new_books = []
-        for usb in self.usb_devices:
-            new_books = self.get_books_from_usb(usb)
-            # add new books to list of books
-            self.new_books.extend(new_books)
+        self.stored_books = [book["filename"] for book in self.storage]
+        for path in self.viewer.book_paths:
+            file = path.split("/")[-1]
+            filename = file.split(".")[0]
+            filetype = file.split(".")[1]
+            # check if the filename is the argument in one of the dictionaries in storage.json
+            if filename not in self.stored_books:
+                self.storage.append({"filename": filename, "type": filetype, "page": 0})
+                # write the new book to storage.json
+                with open(
+                    os.path.join(os.path.dirname(__file__), "storage.json"), "w"
+                ) as storage_file:
+                    json.dump(self.storage, storage_file)
 
-    def open_book(self, path):
+    def open_book(self, path, page: int = 0):
         """Opens a book at the given path"""
         # for book in self.storage:
         #     if os.path.join(book["filename"], book["type"]) == path:
-        self.viewer.load_book(path)
+        self.viewer.load_book(path, page)
 
     def list_usb_devices(self):
         """Returns a list of paths to all connected USB devices"""
